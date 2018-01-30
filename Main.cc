@@ -94,13 +94,15 @@ int main(int argv, char** argc) {
     sprintf(branch_name, "channel_%lu_adc_words", i);
     (void) t_raw_adc_digits.Branch(branch_name, &per_channel_adc_digits[i]);
   }
-  // Same with this vector
-  std::vector<std::vector<double>*> per_channel_adc_fft(n_channels);
+  // Same with these vectors
+  std::vector<std::vector<double>> per_channel_adc_fft_real(n_channels);
+  std::vector<std::vector<double>> per_channel_adc_fft_imag(n_channels);
   for (size_t i = 0; i < n_channels; i++) {
-    per_channel_adc_fft.push_back(new std::vector<double>);
     char branch_name[30];
-    sprintf(branch_name, "channel_%lu_adc_fft", i);
-    (void) t_adc_fft.Branch(branch_name, &per_channel_adc_fft[i]); 
+    sprintf(branch_name, "channel_%lu_adc_fft_real", i);
+    (void) t_adc_fft.Branch(branch_name, &per_channel_adc_fft_real[i]); 
+    sprintf(branch_name, "channel_%lu_adc_fft_imag", i);
+    (void) t_adc_fft.Branch(branch_name, &per_channel_adc_fft_imag[i]); 
   }
 
   TTree t_waveform_data("waveform_data", "waveform_data");
@@ -166,9 +168,10 @@ int main(int argv, char** argc) {
           fftw_complex *adc_fft_data = adc_fft.data();
           // TODO: store
           for (int i = 0; i < adc_fft_size; i++) {
-            double fft_score = adc_fft_data[i][0];
+            //double fft_score = adc_fft_data[i][0];
             //double fft_score = std::sqrt(adc_fft_data[i][0]*adc_fft_data[i][0] + adc_fft_data[i][1]*adc_fft_data[i][1]);
-            per_channel_adc_fft[waveform.first]->push_back(fft_score);
+            per_channel_adc_fft_real[waveform.first].push_back(adc_fft_data[i][0]);
+            per_channel_adc_fft_imag[waveform.first].push_back(adc_fft_data[i][1]);
           } 
         }
       }  // iterate over fragments

@@ -10,7 +10,7 @@ def main(args):
     header_tree = fft_data_file.Get("nevis_header") 
     header_tree.GetEntry(args.entry)
 
-    branchname = "channel_%d_adc_fft" % args.channel
+    branchname = "channel_%d_adc_fft_real" % args.channel
     data = getattr(fft_data, branchname)
 
     graph_title = "Event %i Channel %i FFT" % (header_tree.event_number, args.channel)
