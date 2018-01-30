@@ -5,7 +5,7 @@ import argparse
 def main(args):
     adc_data_file = ROOT.TFile(args.input_file)
 
-    adc_data = adc_data_file.Get("adc_data") 
+    adc_data = adc_data_file.Get("raw_adc_digits") 
     adc_data.GetEntry(args.entry)
     header_tree = adc_data_file.Get("nevis_header") 
     header_tree.GetEntry(args.entry)
