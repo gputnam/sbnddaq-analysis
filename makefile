@@ -14,6 +14,7 @@ CPPFLAGS=-I $(BOOST_INC) \
          -I $(ROOT_INC) \
 	 -I $(TRACE_INC) \
 	 -I $(ARTDAQ_CORE_INC) \
+         -I $(FFTW_INC) \
 	 -I $(SBNDDAQ_DATATYPES_INC)
 	 #-I $(BERNFEBDAQ_CORE_INC)
 
@@ -28,17 +29,22 @@ LDFLAGS=$$(root-config --libs) \
         -L $(LARCOREOBJ_LIB) -l larcoreobj_SummaryData \
         -L $(LARDATAOBJ_LIB) -l lardataobj_RecoBase -l lardataobj_MCBase -l lardataobj_RawData -l lardataobj_OpticalDetectorData -l lardataobj_AnalysisBase \
 	-L $(SBNDDAQ_DATATYPES_LIB) -l sbnddaq-datatypes_Overlays -l sbnddaq-datatypes_NevisTPC \
+        -L $(FFTW_LIBRARY) -l fftw3
 	#-L $(ARTDAQ_CORE_INC) -l artdaq_core
 	#-L $(BERNFEBDAQ_CORE_LIB) -l bernfebdaq_core_Overlays
 
 EXEC=analysis
+OBJECTS = Main.o FFT.o
+SOURCES = $(OBJECTS:.o=.cc)
 
-$(EXEC): Main.cc 
+$(EXEC): $(OBJECTS)
 	@echo Building $(EXEC)
-	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $<
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
 
-all: analysis
+%.o : %.cxx
+	@$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) $< -o $@
 
 clean:
-	rm *.o analysis
+	rm $(EXEC) $(OBJECTS)
 
+all: analysis

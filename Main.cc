@@ -32,6 +32,7 @@
 
 #include "NevisDataHeader.hh"
 #include "WaveformData.hh"
+#include "FFT.hh"
 //This way you can be lazy
 using namespace art;
 
@@ -53,7 +54,7 @@ int main(int argv, char** argc) {
   double frame_to_dt = 1.6e-3; // units of seconds
   TFile* output = new TFile("output.root","RECREATE");
   bool save_waveforms = true;
-  bool verbose = true;
+  bool verbose = false;
   int n_events = 10;
   unsigned n_baseline_samples = 20;
 
@@ -82,6 +83,7 @@ int main(int argv, char** argc) {
   (void)b_trig_frame_time;
 
   TTree t_raw_adc_digits("raw_adc_digits", "raw_adc_digits");
+  TTree t_adc_fft("adc_fft", "adc_fft");
 
   // NOTE: The way things are currently set up, if you push to per_channel_adc_digits 
   // after this loop, the code will SEGFAULT. So don't do that.
@@ -91,6 +93,14 @@ int main(int argv, char** argc) {
     char branch_name[30];
     sprintf(branch_name, "channel_%lu_adc_words", i);
     (void) t_raw_adc_digits.Branch(branch_name, &per_channel_adc_digits[i]);
+  }
+  // Same with this vector
+  std::vector<std::vector<double>*> per_channel_adc_fft(n_channels);
+  for (size_t i = 0; i < n_channels; i++) {
+    per_channel_adc_fft.push_back(new std::vector<double>);
+    char branch_name[30];
+    sprintf(branch_name, "channel_%lu_adc_fft", i);
+    (void) t_adc_fft.Branch(branch_name, &per_channel_adc_fft[i]); 
   }
 
   TTree t_waveform_data("waveform_data", "waveform_data");
@@ -130,7 +140,9 @@ int main(int argv, char** argc) {
 
       std::unordered_map<uint16_t,sbnddaq::NevisTPC_Data_t> waveform_map;
       size_t n_waveforms = fragment.decode_data(waveform_map);
-      std::cout << "Decoded data. Found " << n_waveforms << " waveforms." << std::endl;
+      if (verbose) {
+        std::cout << "Decoded data. Found " << n_waveforms << " waveforms." << std::endl;
+      }
       for (auto waveform: waveform_map) {
         if (save_waveforms && waveform.first < n_channels) {
           unsigned peak = 0;
@@ -142,27 +154,27 @@ int main(int argv, char** argc) {
             waveform_samples.push_back((double) adc);
             per_channel_adc_digits[waveform.first]->push_back((int) adc);
           }
-          /*
-          // calculate FFT
-          TFFTReal fft(waveform_samples.size());
-          fft.SetPoints(&waveform_samples[0]);
-          fft.Transform();
-          // for now make separate array to store output, maybe take out later in optimization?
-          std::vector<double> dft_waveform(waveform_samples.size());
-          fft.GetPoints(&dft_waveform[0]);
-          // TODO: store
-          */
-
           // Baseline calculation assumes baseline is constant and that the first
           // `n_baseline_samples` of the adc values represent a baseline
           per_channel_waveform_data[waveform.first].baseline = 
             std::accumulate(waveform_samples.begin(), waveform_samples.begin() + n_baseline_samples, 0.0) / n_baseline_samples;
 
           per_channel_waveform_data[waveform.first].peak = peak;
+
+          FFT adc_fft(waveform_samples);
+          int adc_fft_size = adc_fft.size();
+          fftw_complex *adc_fft_data = adc_fft.data();
+          // TODO: store
+          for (int i = 0; i < adc_fft_size; i++) {
+            double fft_score = adc_fft_data[i][0];
+            //double fft_score = std::sqrt(adc_fft_data[i][0]*adc_fft_data[i][0] + adc_fft_data[i][1]*adc_fft_data[i][1]);
+            per_channel_adc_fft[waveform.first]->push_back(fft_score);
+          } 
         }
       }  // iterate over fragments
       t_waveform_data.Fill();
       t_raw_adc_digits.Fill();
+      t_adc_fft.Fill();
       header.Fill();
 
       // clear out adc count containers for next iter
@@ -172,11 +184,14 @@ int main(int argv, char** argc) {
     }// Iterate through fragments
   }// Iterate through events
 
-  std::cout << "Saving..." << std::endl;
+  if (verbose) {
+    std::cout << "Saving..." << std::endl;
+  }
   output->cd();
   header.Write();
   t_raw_adc_digits.Write();
   t_waveform_data.Write();
+  t_adc_fft.Write();
 
   output->Close();
   return 0;
