@@ -7,15 +7,11 @@
 // Computes the Discrete Fourier Transform of the _real_ input data.
 // Output has a size 2 *(n/2 + 1) where n is the size of the input data.
 // Returned array must be free'd with fftw_free
-fftw_complex *fft(std::vector<double>& input);
-
-// returns the size of the output array
-int fft_size(std::vector<double>& input);
-
 class FFT {
 public:
   FFT(std::vector<double>& input);
   ~FFT();
+  // returns the size of the output array
   int size();
   fftw_complex *data();
 
