@@ -29,17 +29,17 @@ LDFLAGS=$$(root-config --libs) \
         -L $(LARCOREOBJ_LIB) -l larcoreobj_SummaryData \
         -L $(LARDATAOBJ_LIB) -l lardataobj_RecoBase -l lardataobj_MCBase -l lardataobj_RawData -l lardataobj_OpticalDetectorData -l lardataobj_AnalysisBase \
 	-L $(SBNDDAQ_DATATYPES_LIB) -l sbnddaq-datatypes_Overlays -l sbnddaq-datatypes_NevisTPC \
-        -L $(FFTW_LIBRARY) -l fftw3
+        -L $(FFTW_LIBRARY) -l fftw3 \
+        -L $(PWD) -l sbnddaq_analysis_data_dict \
 	#-L $(ARTDAQ_CORE_INC) -l artdaq_core
 	#-L $(BERNFEBDAQ_CORE_LIB) -l bernfebdaq_core_Overlays
 
 EXEC=analysis
-OBJECTS = Main.o FFT.o
+OBJECTS = Main.o FFT.o 
 SOURCES = $(OBJECTS:.o=.cc)
 
 $(EXEC): $(OBJECTS)
-	@echo Building $(EXEC)
-	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
 
 %.o : %.cxx
 	@$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) $< -o $@
@@ -47,4 +47,8 @@ $(EXEC): $(OBJECTS)
 clean:
 	rm $(EXEC) $(OBJECTS)
 
-all: analysis
+dict: 
+	rootcint -f libsbnddaq_analysis_data_dict.cxx ChannelData.hh HeaderData.hh linkdef.h
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -fPIC -o libsbnddaq_analysis_data_dict.so libsbnddaq_analysis_data_dict.cxx
+
+all: analysis dict

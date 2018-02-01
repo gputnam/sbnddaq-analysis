@@ -5,15 +5,14 @@ import argparse
 def main(args):
     fft_data_file = ROOT.TFile(args.input_file)
 
-    fft_data = fft_data_file.Get("adc_fft") 
+    fft_data = fft_data_file.Get("channel_data") 
     fft_data.GetEntry(args.entry)
     header_tree = fft_data_file.Get("nevis_header") 
     header_tree.GetEntry(args.entry)
 
-    branchname = "channel_%d_adc_fft_real" % args.channel
-    data = getattr(fft_data, branchname)
+    data = fft_data.channel_data[args.channel].fft_real
 
-    graph_title = "Event %i Channel %i FFT" % (header_tree.event_number, args.channel)
+    graph_title = "Event %i Channel %i FFT" % (header_tree.header_data.event_number, args.channel)
     plot(data, args.output, graph_title)
 
 def plot(fft_data, output_name, graph_title):
@@ -38,6 +37,8 @@ def plot(fft_data, output_name, graph_title):
     
 
 if __name__ == "__main__":
+    ROOT.gROOT.ProcessLine(".L libsbnddaq_analysis_data_dict.so")
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input_file", default="output.root")
     parser.add_argument("-o", "--output", default="fft")

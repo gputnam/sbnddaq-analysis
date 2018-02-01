@@ -3,3 +3,4 @@ analysis
 *.o
 *.root
 *.pdf
+libsbnddaq_analysis_data_dict*

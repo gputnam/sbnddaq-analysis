@@ -5,16 +5,15 @@ import argparse
 def main(args):
     adc_data_file = ROOT.TFile(args.input_file)
 
-    adc_data = adc_data_file.Get("raw_adc_digits") 
+    adc_data = adc_data_file.Get("channel_data") 
     adc_data.GetEntry(args.entry)
     header_tree = adc_data_file.Get("nevis_header") 
     header_tree.GetEntry(args.entry)
 
-    branchname = "channel_%d_adc_words" % args.channel
-    data = getattr(adc_data, branchname)
+    waveform = adc_data.channel_data[args.channel].waveform
 
-    graph_title = "Event %i Channel %i Waveform" % (header_tree.event_number, args.channel)
-    plot(data, args.output, graph_title)
+    graph_title = "Event %i Channel %i Waveform" % (header_tree.header_data.event_number, args.channel)
+    plot(waveform, args.output, graph_title)
 
 def plot(adc_data, output_name, graph_title):
     n_data = len(adc_data)
@@ -38,6 +37,7 @@ def plot(adc_data, output_name, graph_title):
     
 
 if __name__ == "__main__":
+    ROOT.gROOT.ProcessLine(".L libsbnddaq_analysis_data_dict.so")
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input_file", default="output.root")
     parser.add_argument("-o", "--output", default="waveform")
