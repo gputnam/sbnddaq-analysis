@@ -35,11 +35,11 @@ LDFLAGS=$$(root-config --libs) \
 	#-L $(BERNFEBDAQ_CORE_LIB) -l bernfebdaq_core_Overlays
 
 EXEC=analysis
-OBJECTS = Main.o FFT.o 
+OBJECTS = Main.o FFT.o Analysis.o
 SOURCES = $(OBJECTS:.o=.cc)
 
 $(EXEC): $(OBJECTS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
 
 %.o : %.cxx
 	@$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) $< -o $@
@@ -48,7 +48,7 @@ clean:
 	rm $(EXEC) $(OBJECTS)
 
 dict: 
-	rootcint -f libsbnddaq_analysis_data_dict.cxx ChannelData.hh HeaderData.hh linkdef.h
+	@rootcint -f libsbnddaq_analysis_data_dict.cxx ChannelData.hh HeaderData.hh linkdef.h
 	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -fPIC -o libsbnddaq_analysis_data_dict.so libsbnddaq_analysis_data_dict.cxx
 
 all: analysis dict
