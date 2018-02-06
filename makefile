@@ -2,6 +2,14 @@
 #Note, being all-incllusive here: you can cut out libraries/includes you do not need
 #you can also change the flags if you want too (Werror, pedantic, etc.)
 
+# defining locations
+SRC=src
+BUILD=build
+
+# and filenames
+SRCEXT=cc
+OBJEXT=o
+
 CPPFLAGS=-I $(BOOST_INC) \
          -I $(CANVAS_INC) \
          -I $(CETLIB_INC) \
@@ -32,25 +40,36 @@ LDFLAGS=$$(root-config --libs) \
 	-L $(SBNDDAQ_DATATYPES_LIB) -l sbnddaq-datatypes_Overlays -l sbnddaq-datatypes_NevisTPC \
         -L $(FFTW_LIBRARY) -l fftw3 \
         -L $(JSONCPP_LIB) -l jsoncpp \
-        -L $(PWD) -l sbnddaq_analysis_data_dict \
+        -L $(PWD)/$(BUILD) -l sbnddaq_analysis_data_dict \
 	#-L $(ARTDAQ_CORE_INC) -l artdaq_core
 	#-L $(BERNFEBDAQ_CORE_LIB) -l bernfebdaq_core_Overlays
 
-EXEC=analysis
-OBJECTS = Main.o FFT.o Analysis.o Noise.o
-SOURCES = $(OBJECTS:.o=.cc)
 
+# executable
+EXEC=analysis
+SOURCES=$(shell find $(SRC) -type f -name *.$(SRCEXT))
+OBJECTS=$(patsubst $(SRC)/%,$(BUILD)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
+
+
+#OBJECTS = Main.o FFT.o Analysis.o Noise.o
+#SOURCES = $(OBJECTS:.o=.cc)
+
+# commands
 $(EXEC): $(OBJECTS)
 	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
 
-%.o : %.cxx
+$(BUILD)/%.$(OBJEXT): $(SRC)/%.$(SRCEXT)
 	@$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) $< -o $@
+check:
+	@echo $(OBJECTS)
+	@echo $(SOURCES)
 
 clean:
 	rm $(EXEC) $(OBJECTS)
 
 dict: 
-	@rootcint -f libsbnddaq_analysis_data_dict.cxx ChannelData.hh HeaderData.hh Noise.hh Noise.cc linkdef.h
-	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -fPIC -o libsbnddaq_analysis_data_dict.so libsbnddaq_analysis_data_dict.cxx
+	@rootcint -f libsbnddaq_analysis_data_dict.cxx $(SRC)/ChannelData.hh $(SRC)/HeaderData.hh $(SRC)/Noise.hh $(SRC)/Noise.cc $(SRC)/linkdef.h
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -fPIC -o $(BUILD)/libsbnddaq_analysis_data_dict.so libsbnddaq_analysis_data_dict.cxx
+	@mv libsbnddaq_analysis_data_dict* $(BUILD)/
 
 all: analysis dict

@@ -28,4 +28,4 @@ setup jsoncpp v1_7_7a -q e14:prof
 export TRACE_MSGMAX=0
 export TRACE_FILE=/run/user/${UID}/tbuffer
 
-export LD_LIBRARY_PATH="$( dirname "${BASH_SOURCE[0]}" )":$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH="$( dirname "${BASH_SOURCE[0]}/build" )":$LD_LIBRARY_PATH
