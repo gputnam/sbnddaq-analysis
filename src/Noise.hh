@@ -5,7 +5,7 @@
 // Calculate the correlated noise of two waveforms
 class Noise {
 public:
-  Noise(std::vector<double> &wvfm_1, std::vector<double> &wvfm_2, int n_baseline_samples);
+  Noise(std::vector<double> &wvfm_1, std::vector<double> &wvfm_2, unsigned n_baseline_samples);
   double RMS1() { return CalcRMS(wvfm_1); }
   double RMS2() { return CalcRMS(wvfm_2); }
   double CorrelatedRMS() { return CalcRMS(wvfm_diff); }

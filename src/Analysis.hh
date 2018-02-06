@@ -10,7 +10,6 @@ public:
     public:
     std::string output_file_name;
     double frame_to_dt;
-    bool save_waveforms;
     bool verbose;
     int n_events;
     unsigned n_baseline_samples;

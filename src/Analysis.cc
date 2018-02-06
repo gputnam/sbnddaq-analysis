@@ -34,6 +34,7 @@
 #include "ChannelData.hh"
 #include "FFT.hh"
 #include "Analysis.hh"
+#include "Noise.hh"
 
 Analysis::Analysis(AnalysisConfig config) : 
   _header_data(), 
@@ -92,25 +93,27 @@ void Analysis::ProcessFragment(const artdaq::Fragment &frag) {
     std::cout << "Decoded data. Found " << n_waveforms << " waveforms." << std::endl;
   }
   for (auto waveform: waveform_map) {
-    if (_config.save_waveforms && waveform.first < _config.n_channels) {
+    if (waveform.first < _config.n_channels) {
 
-      unsigned peak = 0;
-      std::vector<double> waveform_samples;
-      for (auto adc: waveform.second) {
+      double peak = 0;
+      //std::vector<double> waveform_samples;
+      for (unsigned raw_value: waveform.second) {
+        double adc = (double) raw_value;
         if (adc > peak) peak = adc;
       
-        waveform_samples.push_back((double) adc);
         _per_channel_data[waveform.first].waveform.push_back(adc);
       }
 
       // Baseline calculation assumes baseline is constant and that the first
       // `n_baseline_samples` of the adc values represent a baseline
       _per_channel_data[waveform.first].baseline = 
-          std::accumulate(waveform_samples.begin(), waveform_samples.begin() + _config.n_baseline_samples, 0.0) / _config.n_baseline_samples;
+          std::accumulate(_per_channel_data[waveform.first].waveform.begin(), _per_channel_data[waveform.first].waveform.begin() + _config.n_baseline_samples, 0.0) 
+          / _config.n_baseline_samples;
       
       _per_channel_data[waveform.first].peak = peak;
       
-      FFT adc_fft(waveform_samples);
+      // calculate FFTs
+      FFT adc_fft(_per_channel_data[waveform.first].waveform);
       int adc_fft_size = adc_fft.size();
       fftw_complex *adc_fft_data = adc_fft.data();
       for (int i = 0; i < adc_fft_size; i++) {
@@ -119,6 +122,17 @@ void Analysis::ProcessFragment(const artdaq::Fragment &frag) {
       } 
     }
   }
+  // now calculate stuff that depends on stuff between channels
+  for (unsigned i = 0; i < _config.n_channels; i++) {
+    unsigned last_channel_ind = i == 0 ? _config.n_channels - 1 : i - 1;
+    unsigned next_channel_ind = i == _config.n_channels - 1 ? 0 : i + 1;
+    Noise last_channel_noise(_per_channel_data[i].waveform, _per_channel_data[last_channel_ind].waveform, _config.n_baseline_samples);
+    Noise next_channel_noise(_per_channel_data[i].waveform, _per_channel_data[next_channel_ind].waveform, _config.n_baseline_samples);
+    _per_channel_data[i].rms = last_channel_noise.RMS1();
+    _per_channel_data[i].last_channel_correlated_rms = last_channel_noise.CorrelatedRMS();
+    _per_channel_data[i].next_channel_correlated_rms = next_channel_noise.CorrelatedRMS();
+  }
+
   _t_header_data->Fill();
   _t_channel_data->Fill();
   

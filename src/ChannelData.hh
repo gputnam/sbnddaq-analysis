@@ -3,8 +3,11 @@
 
 struct ChannelData {
   double baseline;
-  unsigned peak;
-  std::vector<unsigned> waveform;
+  double peak;
+  double rms;
+  double last_channel_correlated_rms;
+  double next_channel_correlated_rms;
+  std::vector<double> waveform;
   std::vector<double> fft_real;
   std::vector<double> fft_imag;
 };

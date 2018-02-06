@@ -66,7 +66,6 @@ int main(int argv, char** argc) {
   Analysis::AnalysisConfig config;
   config.frame_to_dt = (double) user_config.get("frame_to_dt", 1.6e-3 /* units of seconds */).asFloat();
   config.output_file_name = (char *) user_config.get("output_file_name", "output.root").asCString();
-  config.save_waveforms = user_config.get("save_waveforms", true).asBool();
   config.verbose = user_config.get("verbose", true).asBool();
   config.n_events = user_config.get("n_events", 10).asUInt();
   config.n_baseline_samples = user_config.get("n_baseline_samples", 20).asUInt();
