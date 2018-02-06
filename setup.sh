@@ -23,5 +23,9 @@ export MRB_PROJECT=artdaq
 source ${SBNDDAQ_DATATYPES_LOCATION}/localProducts_artdaq_*/setup
 setup sbnddaq_datatypes ${SBNDDAQ_DATATYPES_TARGET_VERSION} -q ${SBNDDAQ_DATATYPES_TARGET_QUALS}
 
+setup jsoncpp v1_7_7a -q e14:prof
+
 export TRACE_MSGMAX=0
 export TRACE_FILE=/run/user/${UID}/tbuffer
+
+export LD_LIBRARY_PATH="$( dirname "${BASH_SOURCE[0]}" )":$LD_LIBRARY_PATH

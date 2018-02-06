@@ -15,7 +15,8 @@ CPPFLAGS=-I $(BOOST_INC) \
 	 -I $(TRACE_INC) \
 	 -I $(ARTDAQ_CORE_INC) \
          -I $(FFTW_INC) \
-	 -I $(SBNDDAQ_DATATYPES_INC)
+	 -I $(SBNDDAQ_DATATYPES_INC) \
+         -I $(JSONCPP_INC)
 	 #-I $(BERNFEBDAQ_CORE_INC)
 
 CXXFLAGS=-std=c++14 -Wall -Werror -pedantic
@@ -30,12 +31,13 @@ LDFLAGS=$$(root-config --libs) \
         -L $(LARDATAOBJ_LIB) -l lardataobj_RecoBase -l lardataobj_MCBase -l lardataobj_RawData -l lardataobj_OpticalDetectorData -l lardataobj_AnalysisBase \
 	-L $(SBNDDAQ_DATATYPES_LIB) -l sbnddaq-datatypes_Overlays -l sbnddaq-datatypes_NevisTPC \
         -L $(FFTW_LIBRARY) -l fftw3 \
+        -L $(JSONCPP_LIB) -l jsoncpp \
         -L $(PWD) -l sbnddaq_analysis_data_dict \
 	#-L $(ARTDAQ_CORE_INC) -l artdaq_core
 	#-L $(BERNFEBDAQ_CORE_LIB) -l bernfebdaq_core_Overlays
 
 EXEC=analysis
-OBJECTS = Main.o FFT.o Analysis.o
+OBJECTS = Main.o FFT.o Analysis.o Noise.o
 SOURCES = $(OBJECTS:.o=.cc)
 
 $(EXEC): $(OBJECTS)
@@ -48,7 +50,7 @@ clean:
 	rm $(EXEC) $(OBJECTS)
 
 dict: 
-	@rootcint -f libsbnddaq_analysis_data_dict.cxx ChannelData.hh HeaderData.hh linkdef.h
+	@rootcint -f libsbnddaq_analysis_data_dict.cxx ChannelData.hh HeaderData.hh Noise.hh Noise.cc linkdef.h
 	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -fPIC -o libsbnddaq_analysis_data_dict.so libsbnddaq_analysis_data_dict.cxx
 
 all: analysis dict

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <numeric>
-#include <getopt.h>
+#include <fstream>
 
 //some ROOT includes
 #include "TInterpreter.h"
@@ -23,41 +23,53 @@
 #include "gallery/ValidHandle.h"
 #include "canvas/Persistency/Common/FindMany.h"
 #include "canvas/Persistency/Common/FindOne.h"
+#include "artdaq-core/Data/Fragment.hh"
 
+// other shared libraries
+#include <json/json.h>
+
+// sbnddaq stuff
 #include "sbnddaq-datatypes/Overlays/NevisTPCFragment.hh"
 #include "sbnddaq-datatypes/NevisTPC/NevisTPCTypes.hh"
 #include "sbnddaq-datatypes/NevisTPC/NevisTPCUtilities.hh"
 
-#include "artdaq-core/Data/Fragment.hh"
-
+// local stuff
 #include "HeaderData.hh"
 #include "ChannelData.hh"
 #include "FFT.hh"
 #include "Analysis.hh"
 
-//This way you can be lazy
 using namespace art;
 
 int main(int argv, char** argc) {
-  if (argv == 0) {
-    std::cout << "Pass in some imput files" << std::endl;
+  if (argv < 3) {
+    std::cout << "Usage: config_file [input_files]" << std::endl;
     return 1;
   }
-  //We have passed the input file as an argument to the function 
+  // parse configuration
+  std::ifstream configstream(argc[1], std::ifstream::binary);
+  Json::Value user_config;
+  Json::Reader reader;
+  bool r = reader.parse(configstream, user_config);
+  if (!r) {
+    std::cout << "Error parsing configuration file" << std::endl;
+    return 1;
+  }
+
+  // get input files
   std::vector<std::string> filename;
-  for (int i = 1; i < argv; ++i) { 
+  for (int i = 2; i < argv; ++i) { 
     std::cout << "FILE : " << argc[i] << std::endl; 
     filename.push_back(std::string(argc[i]));
   }
 
-  // TODO: make these configurable at command line
   Analysis::AnalysisConfig config;
-  config.frame_to_dt = 1.6e-3; // units of seconds
-  config.output_file_name = (char *)"output.root";
-  config.save_waveforms = true;
-  config.verbose = false;
-  config.n_events = 10;
-  config.n_baseline_samples = 20;
+  config.frame_to_dt = (double) user_config.get("frame_to_dt", 1.6e-3 /* units of seconds */).asFloat();
+  config.output_file_name = (char *) user_config.get("output_file_name", "output.root").asCString();
+  config.save_waveforms = user_config.get("save_waveforms", true).asBool();
+  config.verbose = user_config.get("verbose", true).asBool();
+  config.n_events = user_config.get("n_events", 10).asUInt();
+  config.n_baseline_samples = user_config.get("n_baseline_samples", 20).asUInt();
 
   config.daq_tag = art::InputTag("daq","NEVISTPC");
 
