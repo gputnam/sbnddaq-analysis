@@ -65,11 +65,11 @@ check:
 	@echo $(SOURCES)
 
 clean:
-	rm $(EXEC) $(OBJECTS)
+	rm $(EXEC) $(OBJECTS) $(BUILD)/libsbnddaq_analysis_data_dict*
 
 dict: 
 	@rootcint -f libsbnddaq_analysis_data_dict.cxx $(SRC)/ChannelData.hh $(SRC)/HeaderData.hh $(SRC)/Noise.hh $(SRC)/Noise.cc $(SRC)/FFT.hh $(SRC)/FFT.cc $(SRC)/linkdef.h
 	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -fPIC -o $(BUILD)/libsbnddaq_analysis_data_dict.so libsbnddaq_analysis_data_dict.cxx
 	@mv libsbnddaq_analysis_data_dict* $(BUILD)/
 
-all: analysis dict
+all: dict analysis
