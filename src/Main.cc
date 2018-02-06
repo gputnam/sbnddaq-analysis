@@ -71,11 +71,11 @@ int main(int argv, char** argc) {
   config.n_events = user_config.get("n_events", 10).asUInt();
   config.n_baseline_samples = user_config.get("n_baseline_samples", 20).asUInt();
 
+  // TODO: should this be in config file?
   config.daq_tag = art::InputTag("daq","NEVISTPC");
 
   // TODO: how to detect this?
-  // currently only the first 16 channels have anything interesting
-  config.n_channels = 16;
+  config.n_channels = user_config.get("n_channels", 16 /* currently only the first 16 channels have data */).asUInt();
   
   Analysis ana(config);
 
