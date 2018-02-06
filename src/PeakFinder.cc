@@ -30,9 +30,9 @@ PeakFinder::PeakFinder(std::vector<double> waveform, double baseline, double thr
     }
     else if (inside_peak) {
       inside_peak = false;
-      int baseline_left_ind = std::max(0u, i - smoothing_per_direction*2);
+      int baseline_left_ind = std::max(0u, i - 1 - peak.width - smoothing_per_direction*2);
       double baseline_left = _smoothed_waveform[baseline_left_ind];
-      int baseline_right_ind = std::min((unsigned)_smoothed_waveform.size()-1, i + smoothing_per_direction*2);
+      int baseline_right_ind = std::min((unsigned)_smoothed_waveform.size()-1, i - 1 + smoothing_per_direction*2);
       double baseline_right = _smoothed_waveform[baseline_right_ind];
       peak.baseline = (baseline_left + baseline_right) / 2;
       _peaks.push_back(peak);
