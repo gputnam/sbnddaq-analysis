@@ -18,11 +18,11 @@ def main(args):
 def plot(adc_data, output_name, graph_title):
     n_data = len(adc_data)
 
-    adc_data_array = array('i')
-    time_array = array('i')
+    adc_data_array = array('d')
+    time_array = array('d')
     for i,d in enumerate(adc_data):
         adc_data_array.append(d)
-        time_array.append(i)
+        time_array.append(float(i))
     
     canvas = ROOT.TCanvas("canvas", "Waveform Canvas", 250,100,700,500)
 
@@ -31,6 +31,8 @@ def plot(adc_data, output_name, graph_title):
     graph.GetXaxis().SetTitle("adc number")
     graph.GetYaxis().SetTitle("adc value")
     graph.Draw()
+    if args.wait:
+       raw_input("Press Enter to continue...")
 
     canvas.Update()
     canvas.SaveAs(output_name + ".pdf")
@@ -43,5 +45,6 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output", default="waveform")
     parser.add_argument("-c", "--channel", type=int, default=0)
     parser.add_argument("-e", "--entry", type=int, default=0)
+    parser.add_argument("-w", "--wait", action="store_true")
     
     main(parser.parse_args())

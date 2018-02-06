@@ -37,6 +37,9 @@ def plot(fft_real, fft_imag, output_name, graph_title, ignore_baseline):
     graph.GetYaxis().SetTitle("fft value")
     graph.Draw()
 
+    if args.wait:
+        raw_input("Press Enter to continue...")
+
     canvas.Update()
     canvas.SaveAs(output_name + ".pdf")
     
@@ -50,5 +53,6 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--channel", type=int, default=0)
     parser.add_argument("-e", "--entry", type=int, default=0)
     parser.add_argument("-b", "--keep_baseline", action="store_true")
+    parser.add_argument("-w", "--wait", action="store_true")
     
     main(parser.parse_args())
