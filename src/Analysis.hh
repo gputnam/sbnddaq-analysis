@@ -8,7 +8,7 @@ class Analysis {
 public:
   struct AnalysisConfig {
     public:
-    char *output_file_name;
+    std::string output_file_name;
     double frame_to_dt;
     bool save_waveforms;
     bool verbose;

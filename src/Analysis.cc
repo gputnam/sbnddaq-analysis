@@ -38,7 +38,7 @@
 Analysis::Analysis(AnalysisConfig config) : 
   _header_data(), 
   _per_channel_data(config.n_channels),
-  _output_file(config.output_file_name, "RECREATE")
+  _output_file(config.output_file_name.c_str(), "RECREATE")
 {
   _output_file.cd();
   
