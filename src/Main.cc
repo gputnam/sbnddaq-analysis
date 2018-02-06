@@ -80,6 +80,12 @@ int main(int argv, char** argc) {
 
   for (gallery::Event ev(filename) ; !ev.atEnd(); ev.next()) {
    if (!ana.ProcessEvent(ev)) break;
+   // @ANDY:
+   // I think this is where you'd want to put any redis code.
+   // You can access the channel data (stored as a vector<ChannelData>)
+   // by calling ana.ChannelDataRef()
+   // And yo ucan access the header data (stored as a HeaderData)
+   // by calling ana.HeaderDataRef()
   }
   return 0;
 }

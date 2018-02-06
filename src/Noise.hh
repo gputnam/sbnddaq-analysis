@@ -6,9 +6,9 @@
 class Noise {
 public:
   Noise(std::vector<double> &wvfm_1, std::vector<double> &wvfm_2, unsigned n_baseline_samples);
-  double RMS1() { return CalcRMS(wvfm_1); }
-  double RMS2() { return CalcRMS(wvfm_2); }
-  double CorrelatedRMS() { return CalcRMS(wvfm_diff); }
+  inline double RMS1() { return CalcRMS(wvfm_1); }
+  inline double RMS2() { return CalcRMS(wvfm_2); }
+  inline double CorrelatedRMS() { return CalcRMS(wvfm_diff); }
 private:
   static double CalcRMS(std::vector<double> &wvfm);
 

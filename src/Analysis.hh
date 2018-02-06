@@ -23,8 +23,8 @@ public:
   bool ProcessEvent(gallery::Event &event);
   void ProcessFragment(const artdaq::Fragment &frag);
 
-  HeaderData *HeaderDataRef() { return &_header_data; }
-  std::vector<ChannelData> *ChannelDataRef() { return &_per_channel_data; }
+  inline HeaderData *HeaderDataRef() { return &_header_data; }
+  inline std::vector<ChannelData> *ChannelDataRef() { return &_per_channel_data; }
 
 protected:
   HeaderData _header_data;
