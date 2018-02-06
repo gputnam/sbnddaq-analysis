@@ -20,6 +20,12 @@ of one of the drivers from `sbnddaq-readout` (e.g. `test_driver`).
 See `Main.cc` for what can be configured in the `.json` configration
 file.
 
+**Calculations:**
+
+Currently, the analysis code stores waveforms and calculates: FFT,
+baseline, peaks, and rms noise (of each channel and correlated between
+adjacent channels).
+
 **Plots**
 
 Plotting scripts are in the `scripts` directory. As an example, 
