@@ -35,6 +35,7 @@
 #include "FFT.hh"
 #include "Analysis.hh"
 #include "Noise.hh"
+#include "PeakFinder.hh"
 
 Analysis::Analysis(AnalysisConfig config) : 
   _header_data(), 
@@ -71,6 +72,7 @@ void Analysis::ProcessFragment(const artdaq::Fragment &frag) {
     _per_channel_data[i].waveform.clear();
     _per_channel_data[i].fft_real.clear();
     _per_channel_data[i].fft_imag.clear();
+    _per_channel_data[i].peaks.clear();
   }
 
   sbnddaq::NevisTPCFragment fragment(frag);
@@ -95,11 +97,11 @@ void Analysis::ProcessFragment(const artdaq::Fragment &frag) {
   for (auto waveform: waveform_map) {
     if (waveform.first < _config.n_channels) {
 
-      double peak = 0;
+      double max = 0;
       //std::vector<double> waveform_samples;
       for (unsigned raw_value: waveform.second) {
         double adc = (double) raw_value;
-        if (adc > peak) peak = adc;
+        if (adc > max) max = adc;
       
         _per_channel_data[waveform.first].waveform.push_back(adc);
       }
@@ -110,7 +112,7 @@ void Analysis::ProcessFragment(const artdaq::Fragment &frag) {
           std::accumulate(_per_channel_data[waveform.first].waveform.begin(), _per_channel_data[waveform.first].waveform.begin() + _config.n_baseline_samples, 0.0) 
           / _config.n_baseline_samples;
       
-      _per_channel_data[waveform.first].peak = peak;
+      _per_channel_data[waveform.first].max = max;
       
       // calculate FFTs
       FFT adc_fft(_per_channel_data[waveform.first].waveform);
@@ -120,6 +122,10 @@ void Analysis::ProcessFragment(const artdaq::Fragment &frag) {
         _per_channel_data[waveform.first].fft_real.push_back(adc_fft_data[i][0]);
         _per_channel_data[waveform.first].fft_imag.push_back(adc_fft_data[i][1]);
       } 
+
+      // get Peaks
+      PeakFinder peaks(_per_channel_data[waveform.first].waveform, _per_channel_data[waveform.first].baseline);
+      _per_channel_data[waveform.first].peaks.assign(peaks.Peaks()->begin(), peaks.Peaks()->end());
     }
   }
   // now calculate stuff that depends on stuff between channels
