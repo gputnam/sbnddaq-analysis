@@ -37,7 +37,7 @@ def plot(adc_data, output_name, graph_title):
     
 
 if __name__ == "__main__":
-    ROOT.gROOT.ProcessLine(".L libsbnddaq_analysis_data_dict.so")
+    ROOT.gROOT.ProcessLine(".L ../build/libsbnddaq_analysis_data_dict.so")
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input_file", default="output.root")
     parser.add_argument("-o", "--output", default="waveform")
