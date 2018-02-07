@@ -49,27 +49,20 @@ LDFLAGS=$$(root-config --libs) \
 EXEC=analysis
 SOURCES=$(shell find $(SRC) -type f -name *.$(SRCEXT))
 OBJECTS=$(patsubst $(SRC)/%,$(BUILD)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
-
-
-#OBJECTS = Main.o FFT.o Analysis.o Noise.o
-#SOURCES = $(OBJECTS:.o=.cc)
+OBJECTS+=dict
 
 # commands
+dict: 
+	@rootcint -f libsbnddaq_analysis_data_dict.cxx $(SRC)/ChannelData.hh $(SRC)/HeaderData.hh $(SRC)/Noise.hh $(SRC)/Noise.cc $(SRC)/FFT.hh $(SRC)/FFT.cc $(SRC)/linkdef.h
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -fPIC -o $(BUILD)/libsbnddaq_analysis_data_dict.so libsbnddaq_analysis_data_dict.cxx
+	@mv libsbnddaq_analysis_data_dict* $(BUILD)/
 $(EXEC): $(OBJECTS)
 	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
-
 $(BUILD)/%.$(OBJEXT): $(SRC)/%.$(SRCEXT)
 	@$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) $< -o $@
 check:
 	@echo $(OBJECTS)
 	@echo $(SOURCES)
-
 clean:
 	rm $(EXEC) $(OBJECTS) $(BUILD)/libsbnddaq_analysis_data_dict*
-
-dict: 
-	@rootcint -f libsbnddaq_analysis_data_dict.cxx $(SRC)/ChannelData.hh $(SRC)/HeaderData.hh $(SRC)/Noise.hh $(SRC)/Noise.cc $(SRC)/FFT.hh $(SRC)/FFT.cc $(SRC)/linkdef.h
-	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -shared -fPIC -o $(BUILD)/libsbnddaq_analysis_data_dict.so libsbnddaq_analysis_data_dict.cxx
-	@mv libsbnddaq_analysis_data_dict* $(BUILD)/
-
 all: dict analysis
