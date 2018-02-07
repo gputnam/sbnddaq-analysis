@@ -1,6 +1,9 @@
 import ROOT
+import os
+import sys
 from array import array
 import argparse
+import math
 
 def main(args):
     fft_data_file = ROOT.TFile(args.input_file)
@@ -26,7 +29,7 @@ def plot(fft_real, fft_imag, output_name, graph_title, args):
     for i,(re,im) in enumerate(zip(fft_real, fft_imag)):
         if i < skip:
             continue
-        d = (re*re + im*im)**(1./2.)
+        d = math.sqrt((re*re + im*im))
         fft_data_array.append(d)
         freq_array.append(float(i+skip))
 
@@ -47,7 +50,11 @@ def plot(fft_real, fft_imag, output_name, graph_title, args):
     
 
 if __name__ == "__main__":
-    ROOT.gROOT.ProcessLine(".L ../build/libsbnddaq_analysis_data_dict.so")
+    buildpath = os.environ["SBNDDAQ_ANALYSIS_BUILD_PATH"]
+    if not buildpath:
+        print "ERROR: SBNDDAQ_ANALYSIS_BUILD_PATH not set"
+        sys.exit() 
+    ROOT.gROOT.ProcessLine(".L " + buildpath + "/libsbnddaq_analysis_data_dict.so")
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input_file", default="output.root")

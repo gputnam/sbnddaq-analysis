@@ -4,7 +4,7 @@
 
 # defining locations
 SRC=src
-BUILD=build
+BUILD=$(SBNDDAQ_ANALYSIS_BUILD_PATH)
 
 # and filenames
 SRCEXT=cc
@@ -64,5 +64,6 @@ $(BUILD)/%.$(OBJEXT): $(SRC)/%.$(SRCEXT)
 check:
 	@echo $(OBJECTS)
 	@echo $(SOURCES)
+	@echo $(BUILD)
 clean:
 	rm $(EXEC) $(OBJECTS) $(BUILD)/libsbnddaq_analysis_data_dict*

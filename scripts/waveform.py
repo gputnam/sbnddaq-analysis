@@ -1,4 +1,6 @@
 import ROOT
+import sys
+import os
 from array import array
 import argparse
 
@@ -39,7 +41,11 @@ def plot(adc_data, output_name, graph_title, args):
     
 
 if __name__ == "__main__":
-    ROOT.gROOT.ProcessLine(".L ../build/libsbnddaq_analysis_data_dict.so")
+    buildpath = os.environ["SBNDDAQ_ANALYSIS_BUILD_PATH"]
+    if not buildpath:
+        print "ERROR: SBNDDAQ_ANALYSIS_BUILD_PATH not set"
+        sys.exit() 
+    ROOT.gROOT.ProcessLine(".L " + buildpath + "/libsbnddaq_analysis_data_dict.so")
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input_file", default="output.root")
     parser.add_argument("-o", "--output", default="waveform")
