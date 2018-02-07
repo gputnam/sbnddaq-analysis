@@ -18,7 +18,6 @@ def main(args):
 
     graph_title = "Event %i Channel %i FFT" % (header_tree.header_data.event_number, args.channel)
     plot(real, imag, args.output, graph_title, args)
-    #not args.keep_baseline, args.wait)
 
 def plot(fft_real, fft_imag, output_name, graph_title, args):
     skip = int(not args.keep_baseline)

@@ -21,6 +21,7 @@ FFT::FFT(std::vector<double>& input) {
 
 FFT::~FFT() {
   fftw_free(_fft_array);
+  fftw_destroy_plan(_plan);
 }
 
 int FFT::size() {

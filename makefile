@@ -40,7 +40,7 @@ LDFLAGS=$$(root-config --libs) \
 	-L $(SBNDDAQ_DATATYPES_LIB) -l sbnddaq-datatypes_Overlays -l sbnddaq-datatypes_NevisTPC \
         -L $(FFTW_LIBRARY) -l fftw3 \
         -L $(JSONCPP_LIB) -l jsoncpp \
-        -L $(PWD)/$(BUILD) -l sbnddaq_analysis_data_dict \
+        -L $(BUILD) -l sbnddaq_analysis_data_dict \
 	#-L $(ARTDAQ_CORE_INC) -l artdaq_core
 	#-L $(BERNFEBDAQ_CORE_LIB) -l bernfebdaq_core_Overlays
 
