@@ -1,4 +1,5 @@
 #include <vector>
+#include <iostream>
 
 #include "fftw3.h"
 
@@ -7,9 +8,9 @@
 FFT::FFT(std::vector<double>& input) {
   int input_size = input.size();
   double *fft_input = &input[0];
-  
-  _fft_size = 2 * (input_size / 2 + 1);
-  _fft_array = fftw_alloc_complex(input_size);
+
+  _fft_size = input_size / 2 + 1;
+  _fft_array = fftw_alloc_complex(_fft_size);
   
   unsigned flags = FFTW_ESTIMATE;
   

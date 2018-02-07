@@ -49,7 +49,7 @@ LDFLAGS=$$(root-config --libs) \
 EXEC=analysis
 SOURCES=$(shell find $(SRC) -type f -name *.$(SRCEXT))
 OBJECTS=$(patsubst $(SRC)/%,$(BUILD)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
-OBJECTS+=dict
+#OBJECTS+=dict
 
 # commands
 dict: 

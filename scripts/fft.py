@@ -14,10 +14,11 @@ def main(args):
     imag = fft_data.channel_data[args.channel].fft_imag
 
     graph_title = "Event %i Channel %i FFT" % (header_tree.header_data.event_number, args.channel)
-    plot(real, imag, args.output, graph_title, not args.keep_baseline)
+    plot(real, imag, args.output, graph_title, args)
+    #not args.keep_baseline, args.wait)
 
-def plot(fft_real, fft_imag, output_name, graph_title, ignore_baseline):
-    skip = int(ignore_baseline)
+def plot(fft_real, fft_imag, output_name, graph_title, args):
+    skip = int(not args.keep_baseline)
     n_data = len(fft_real) - skip
 
     fft_data_array = array('d')
@@ -36,12 +37,13 @@ def plot(fft_real, fft_imag, output_name, graph_title, ignore_baseline):
     graph.GetXaxis().SetTitle("fft number")
     graph.GetYaxis().SetTitle("fft value")
     graph.Draw()
+    canvas.Update()
 
     if args.wait:
         raw_input("Press Enter to continue...")
 
-    canvas.Update()
-    canvas.SaveAs(output_name + ".pdf")
+    if args.save:
+        canvas.SaveAs(output_name + ".pdf")
     
 
 if __name__ == "__main__":
@@ -54,5 +56,6 @@ if __name__ == "__main__":
     parser.add_argument("-e", "--entry", type=int, default=0)
     parser.add_argument("-b", "--keep_baseline", action="store_true")
     parser.add_argument("-w", "--wait", action="store_true")
+    parser.add_argument("-s", "--save", action="store_true")
     
     main(parser.parse_args())

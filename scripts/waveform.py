@@ -13,9 +13,9 @@ def main(args):
     waveform = adc_data.channel_data[args.channel].waveform
 
     graph_title = "Event %i Channel %i Waveform" % (header_tree.header_data.event_number, args.channel)
-    plot(waveform, args.output, graph_title)
+    plot(waveform, args.output, graph_title, args)
 
-def plot(adc_data, output_name, graph_title):
+def plot(adc_data, output_name, graph_title, args):
     n_data = len(adc_data)
 
     adc_data_array = array('d')
@@ -31,11 +31,11 @@ def plot(adc_data, output_name, graph_title):
     graph.GetXaxis().SetTitle("adc number")
     graph.GetYaxis().SetTitle("adc value")
     graph.Draw()
+    canvas.Update()
     if args.wait:
        raw_input("Press Enter to continue...")
-
-    canvas.Update()
-    canvas.SaveAs(output_name + ".pdf")
+    if args.save:
+       canvas.SaveAs(output_name + ".pdf")
     
 
 if __name__ == "__main__":
@@ -46,5 +46,6 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--channel", type=int, default=0)
     parser.add_argument("-e", "--entry", type=int, default=0)
     parser.add_argument("-w", "--wait", action="store_true")
+    parser.add_argument("-s", "--save", action="store_true")
     
     main(parser.parse_args())
