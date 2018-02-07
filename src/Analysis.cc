@@ -58,15 +58,6 @@ bool Analysis::ProcessEvent(gallery::Event &event) {
 
   _event_ind ++;
 
-  auto const& daq_handle = event.getValidHandle<std::vector<artdaq::Fragment>>(_config.daq_tag);
-  
-  for (auto const& rawfrag: *daq_handle) {
-    ProcessFragment(rawfrag);
-  }
-  return true;
-}
-
-void Analysis::ProcessFragment(const artdaq::Fragment &frag) {
   // clear out containers from last iter
   for (unsigned i = 0; i < _config.n_channels; i++) {
     _per_channel_data[i].waveform.clear();
@@ -74,6 +65,21 @@ void Analysis::ProcessFragment(const artdaq::Fragment &frag) {
     _per_channel_data[i].fft_imag.clear();
     _per_channel_data[i].peaks.clear();
   }
+
+  auto const& daq_handle = event.getValidHandle<std::vector<artdaq::Fragment>>(_config.daq_tag);
+  
+  for (auto const& rawfrag: *daq_handle) {
+    ProcessFragment(rawfrag);
+  }
+
+  // Fill trees
+  _t_header_data->Fill();
+  _t_channel_data->Fill();
+  
+  return true;
+}
+
+void Analysis::ProcessFragment(const artdaq::Fragment &frag) {
 
   sbnddaq::NevisTPCFragment fragment(frag);
   auto fragment_header = fragment.header(); 
@@ -139,9 +145,6 @@ void Analysis::ProcessFragment(const artdaq::Fragment &frag) {
     _per_channel_data[i].next_channel_correlated_rms = next_channel_noise.CorrelatedRMS();
   }
 
-  _t_header_data->Fill();
-  _t_channel_data->Fill();
-  
 }
 
 Analysis::~Analysis() {
