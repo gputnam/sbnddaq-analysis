@@ -13,6 +13,7 @@ public:
     bool verbose;
     int n_events;
     unsigned n_baseline_samples;
+    unsigned n_smoothing_samples;
     size_t n_channels;
     art::InputTag daq_tag;
   };

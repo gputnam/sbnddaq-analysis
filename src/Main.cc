@@ -69,6 +69,7 @@ int main(int argv, char** argc) {
   config.verbose = user_config.get("verbose", true).asBool();
   config.n_events = user_config.get("n_events", 10).asUInt();
   config.n_baseline_samples = user_config.get("n_baseline_samples", 20).asUInt();
+  config.n_smoothing_samples = user_config.get("n_smoothing_samples", 1).asUInt();
 
   // TODO: should this be in config file?
   config.daq_tag = art::InputTag("daq","NEVISTPC");

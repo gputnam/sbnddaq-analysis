@@ -5,7 +5,7 @@
 
 // TODO: This should probably have a better name
 
-struct HeaderData {
+class HeaderData {
   public:
   uint32_t event_number;
   uint32_t frame_number;

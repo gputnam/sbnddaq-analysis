@@ -1,5 +1,6 @@
 #include <vector>
 #include <numeric>
+#include <math.h> 
 
 
 #include "Noise.hh"
@@ -31,6 +32,6 @@ double Noise::CalcRMS(std::vector<double> &wvfm) {
     ret += wvfm[i] * wvfm[i];
   }
   ret /= wvfm.size();
-  return ret;
+  return sqrt(ret);
   
 }

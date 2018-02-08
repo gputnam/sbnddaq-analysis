@@ -9,7 +9,8 @@
 // good basline) and tries to make peaks for them.
 class PeakFinder {
 public:
-  struct Peak {
+  class Peak {
+  public:
     double amplitude;
     unsigned width;
     double baseline;
@@ -19,9 +20,14 @@ public:
       width = 0;      
       baseline = 0;
     }
+    void reset() {
+      amplitude = -DBL_MAX;
+      width = 0;
+      baseline = 0;
+    }
   };
 
-  PeakFinder(std::vector<double> waveform, double baseline, double threshold=100., unsigned n_smoothing_points=5);
+  PeakFinder(std::vector<double> waveform, double baseline, unsigned n_smoothing_samples=1, double threshold=100.);
   inline std::vector<Peak> *Peaks() { return &_peaks; }
 private:
   std::vector<double> _smoothed_waveform;

@@ -5,7 +5,8 @@
 
 #include "PeakFinder.hh"
 
-struct ChannelData {
+class ChannelData {
+public:
   double baseline;
   double max;
   double rms;

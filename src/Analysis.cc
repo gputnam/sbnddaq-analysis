@@ -71,7 +71,6 @@ bool Analysis::ProcessEvent(gallery::Event &event) {
   for (auto const& rawfrag: *daq_handle) {
     ProcessFragment(rawfrag);
   }
-
   // Fill trees
   _t_header_data->Fill();
   _t_channel_data->Fill();
@@ -130,7 +129,7 @@ void Analysis::ProcessFragment(const artdaq::Fragment &frag) {
       } 
 
       // get Peaks
-      PeakFinder peaks(_per_channel_data[waveform.first].waveform, _per_channel_data[waveform.first].baseline);
+      PeakFinder peaks(_per_channel_data[waveform.first].waveform, _per_channel_data[waveform.first].baseline, _config.n_smoothing_samples);
       _per_channel_data[waveform.first].peaks.assign(peaks.Peaks()->begin(), peaks.Peaks()->end());
     }
   }
