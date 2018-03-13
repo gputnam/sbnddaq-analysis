@@ -140,8 +140,8 @@ void Analysis::ProcessFragment(const artdaq::Fragment &frag) {
     Noise last_channel_noise(_per_channel_data[i].waveform, _per_channel_data[last_channel_ind].waveform, _config.n_baseline_samples);
     Noise next_channel_noise(_per_channel_data[i].waveform, _per_channel_data[next_channel_ind].waveform, _config.n_baseline_samples);
     _per_channel_data[i].rms = last_channel_noise.RMS1();
-    _per_channel_data[i].last_channel_covariance = last_channel_noise.Covariance();
-    _per_channel_data[i].next_channel_covariance = next_channel_noise.Covariance();
+    _per_channel_data[i].last_channel_correlation = last_channel_noise.Correlation();
+    _per_channel_data[i].next_channel_correlation = next_channel_noise.Correlation();
   }
 
 }

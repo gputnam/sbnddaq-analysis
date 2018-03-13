@@ -22,7 +22,10 @@ PeakFinder::PeakFinder(std::vector<double> waveform, double baseline, unsigned n
   for (unsigned i = 0; i < _smoothed_waveform.size(); i++) {
     double dat = _smoothed_waveform[i];
     if (dat > baseline + threshold) {
-      inside_peak = true;
+      if (!inside_peak) {
+        peak.start = i;
+        inside_peak = true;
+      }
       peak.width ++;
       if (dat > peak.amplitude) {
         peak.amplitude = dat;

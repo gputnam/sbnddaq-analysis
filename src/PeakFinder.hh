@@ -13,6 +13,7 @@ public:
   public:
     double amplitude;
     unsigned width;
+    unsigned start;
     double baseline;
 
     Peak() {

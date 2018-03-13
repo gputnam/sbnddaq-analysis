@@ -35,6 +35,10 @@ double Noise::CalcCov(std::vector<double> &wvfm_1, std::vector<double> &wvfm_2) 
   return ret;
 }
 
+double Noise::CalcCor(std::vector<double> &wvfm_1, std::vector<double> &wvfm_2) {
+  return CalcCov(wvfm_1, wvfm_2) / CalcRMS(wvfm_1) / CalcRMS(wvfm_2);
+}
+
 double Noise::CalcRMS(std::vector<double> &wvfm) {
   double ret = 0;
   for (unsigned i = 0; i < wvfm.size(); i++) {

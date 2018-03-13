@@ -13,11 +13,12 @@ def main(args):
     header_tree.GetEntry(args.entry)
 
     waveform = adc_data.channel_data[args.channel].waveform
+    peaks = adc_data.channel_data[args.channel].peaks
 
     graph_title = "Event %i Channel %i Waveform" % (header_tree.header_data.event_number, args.channel)
-    plot(waveform, args.output, graph_title, args)
+    plot(waveform, args.output, peaks, graph_title, args)
 
-def plot(adc_data, output_name, graph_title, args):
+def plot(adc_data, output_name, peaks, graph_title, args):
     n_data = len(adc_data)
 
     adc_data_array = array('d')
@@ -33,6 +34,21 @@ def plot(adc_data, output_name, graph_title, args):
     graph.GetXaxis().SetTitle("adc number")
     graph.GetYaxis().SetTitle("adc value")
     graph.Draw()
+
+    peak_graphs = []
+    if args.draw_peaks:
+        for peak in peaks:
+            n_data = peak.width
+            peak_graphs.append( ROOT.TGraph(n_data*2) )
+            for i in range(n_data):
+                waveform_ind = peak.start + i
+                peak_graphs[-1].SetPoint(i, time_array[waveform_ind], adc_data_array[waveform_ind])
+                peak_graphs[-1].SetPoint(n_data+i, time_array[peak.start + n_data-i-1], peak.baseline)
+            peak_graphs[-1].SetFillStyle(1001)
+            peak_graphs[-1].SetFillColor(8)
+            peak_graphs[-1].Draw("f")
+        
+
     canvas.Update()
     if args.wait:
        raw_input("Press Enter to continue...")
@@ -53,5 +69,6 @@ if __name__ == "__main__":
     parser.add_argument("-e", "--entry", type=int, default=0)
     parser.add_argument("-w", "--wait", action="store_true")
     parser.add_argument("-s", "--save", action="store_true")
+    parser.add_argument("-p", "--draw_peaks", action="store_true")
     
     main(parser.parse_args())
